@@ -1,1 +1,1 @@
-https://artificialanalysis.ai/leaderboards/providers
+artificialanalysis.ai https://artificialanalysis.ai/leaderboards/providers
