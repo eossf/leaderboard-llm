@@ -250,3 +250,97 @@ That's an ops complexity you can defer to v0.0.2.
 This is solid for v0.0.1. When a second source arrives with different structure, the adapter pattern handles it, and the extras JSON absorbs the variance.
 
 Ready to formalize into a change proposal when you are.
+
+---
+
+## v0.0.1 — Full Summary
+
+### Purpose
+Persist LLM model performance data from web sources into a local SQLite database. New sources can be added without losing existing data. No UI or backend service — single CLI invocation per source run.
+
+---
+
+### Architecture
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│  SOURCES.md                                                  │
+│  (name | url table, manually curated)                         │
+│                                                              │
+│  python run.py --all                                         │
+│          └── reads SOURCES.md                                │
+│                  └── for each source:                        │
+│                          ├── fetch HTML from URL             │
+│                          ├── adapter: HTML → JSON            │
+│                          ├── parse JSON                      │
+│                          └── persist to SQLite               │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Storage
+
+**File:** `data.leaderboard.sqlite`
+
+| Table | Columns | Purpose |
+|-------|---------|---------|
+| `Source` | `id` (PK), `fetched_at`, `source_name`, `url`, `raw` | One row per run per source. `raw` stores the raw fetched JSON blob. Never modified after insert. |
+| `Source_mapping` | `id` (PK), `source_id` (FK), `model_name`, `extras` (JSON) | Parsed rows. `extras` absorbs source-specific fields. Schema version stored to allow re-parsing if needed. |
+
+---
+
+### Data Model (Hybrid)
+
+| Field | Where | Notes |
+|-------|-------|-------|
+| `source_name` | `Source` | FQDN-based, e.g. `artificialanalysis.ai` |
+| `fetched_at` | Both | `DD/MM/YYYY hh:mm:ss` format |
+| `model_name` | `Source_mapping` | Common across all sources |
+| `raw` | `Source` | Original JSON/HTML — immutable snapshot |
+| `extras` | `Source_mapping` | JSON blob for source-specific fields |
+| `schema_version` | `Source_mapping` | Tracks parser version for re-parsing |
+
+---
+
+### Key Decisions
+
+| Topic | Decision |
+|-------|----------|
+| **DB engine** | SQLite — zero-config, file-based, Python stdlib |
+| **Data model** | Option C hybrid: common columns + JSON extras |
+| **History** | Insert-only, never update or delete |
+| **Re-fetch behavior** | Always insert new rows, preserve history |
+| **Source discovery** | Manual — edit SOURCES.md, then run |
+| **Invocation** | CLI: `run.py --all` or `run.py --source=<name>` |
+| **Error handling** | GRACEFUL SKIP — warn and continue, persist successful sources |
+| **Adapter pattern** | Per-source fetch+HTML-to-JSON converter |
+| **Schema evolution** | Schema registration step for new sources / updates |
+
+---
+
+### CLI Interface
+
+```bash
+python run.py --all                  # fetch all sources in SOURCES.md
+python run.py --source=<name>        # fetch single source by name
+```
+
+---
+
+### Workflow: Adding a New Source
+
+1. Add entry to `SOURCES.md` — `name | url`
+2. Run `python run.py --source=<newsource>` (or `--all`)
+3. System fetches, parses, persists — raw blob + structured rows
+4. Done. No code changes required.
+
+---
+
+### What's Deliberately Excluded (v0.0.1)
+
+- No cross-source ranking or queries
+- No automatic source discovery
+- No re-parsing of old raw blobs
+- No UI or API
+- No scheduling / daemon mode
