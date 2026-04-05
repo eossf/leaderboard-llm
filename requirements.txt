@@ -1,0 +1,6 @@
+pysqlite3
+bs4
+argparse
+logging
+Path
+requests
