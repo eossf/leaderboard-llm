@@ -1,6 +1,6 @@
-# Chat conversation here
+# Exploration
 
-## Round 1. steph
+## Round 1.
 
 ### Exploring the Problem Space
 
@@ -92,7 +92,7 @@ Given v0.0.1 is "just get a source, persist" — Pattern B feels right. One run 
 ---
 
 
-## Round 3. steph
+## Round 3.
 
 - On Option C (Hybrid model): Query per source only, at each run, with the whole possible data. The run is the persisted. That's it.
 - On history preservation: never loose data. The mapping is not clear at this stage. We refine further
@@ -152,7 +152,7 @@ For v0.0.1, GRACEFUL SKIP feels right — you don't want one bad source to wipe 
 
 Ready to converge when you are. Or keep going — there's depth left to explore.
 
-## Round 5.steph
+## Round 5.
 
 - On "the run is what's persisted:  Option C: Both — raw blob in one table, parsed rows in another (or as extras JSON). Never touch old run in any cases.
 - On error handling: GRACEFUL SKIP → log warning, continue to next source, persist successful ones

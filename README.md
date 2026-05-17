@@ -49,4 +49,4 @@ openspec init
 
 ```bash
 /opsx.explore Build an application which get data from SOURCES.md relative to LLM models performance. Persist data in light sql database, with a date DD/MM/YYYY hh:mm:ss. We add sources furthermore, the application will be able to add new source without losing information. No need UI or backend service for this version first version 0.0.1. It's only get a source, persist. When adding a new source, get it persist it. And so on we could add whatever kind of source based on URL web site for this version.
-
+```
