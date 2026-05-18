@@ -2,6 +2,13 @@
 
 Find the best token/s , value and cheap model
 
+## Git
+
+```bash
+git config --local core.sshCommand "ssh -i /c/Users/steph/.ssh/github_eossf/id_rsa"
+
+```
+
 ## Install
 
 ### Micromamba
